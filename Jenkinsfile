@@ -1,9 +1,25 @@
 pipeline {
+
     agent { dockerfile true }
-    stages {
-        stage('Test') {
-            steps {
-                sh 'echo "All ok, if you see this"'
+
+    stage ('Build image') {
+        // Build our docker image
+        myImg = docker.build 'PythonServer'
+    }
+
+    // Stopping Docker containers for cleaner Docker run
+    stage('Docker stop container') {
+        steps {
+            sh 'docker ps -f name=PythonServerContainer -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=PythonServerContainer -q | xargs -r docker container rm'
+        }
+    }
+
+    // Running Docker container, make sure port 8096 is opened in
+    stage('Docker Run') {
+        steps {
+            script {
+                dockerImage.run("-p 8000:8000 --rm --name PythonServer")
             }
         }
     }
