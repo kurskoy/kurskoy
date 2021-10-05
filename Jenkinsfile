@@ -3,9 +3,13 @@ pipeline {
     agent { dockerfile true }
 
     stages {
-        stage ('Build image') {
-        // Build our docker image
-        myImg = docker.build 'PythonServer'
+        // Building Docker images
+        stage('Building image') {
+            steps {
+                script {
+                    dockerImage = docker.build 'python_server:latest'
+                }
+            }
         }
 
         // Stopping Docker containers for cleaner Docker run
